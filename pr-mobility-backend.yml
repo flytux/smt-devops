@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: smt-mobility-build-
+spec:
+  serviceAccountName: sa-pipeline-runner
+  pipelineRef:
+    name: build-gradle-jib
+  params:
+  - name: revision
+    value: master
+  - name: insecure-registry
+    value: "true"
+  - name: subdirectory
+    value: "mobility_back"
+  - name: git-url
+    value: http://gitea.gitea:3000/tekton/mobility_back.git
+  - name: image-url
+    value: "docker.smt-devops/mobility"
+  workspaces:
+  - name: source
+    persistentvolumeclaim:
+      claimName: pvc-mobility-build
+  - name: gitops
+    emptyDir: {}
+

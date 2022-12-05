@@ -1,0 +1,89 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-gradle-jib
+spec:
+  params:
+    - name: git-url 
+    - name: revision
+      default: master
+    - name: subdirectory
+    - name: image-url 
+    - name: insecure-registry
+      default: "false"
+    - name: build-stage
+      default: "dev"
+  workspaces:
+    - name: source 
+    - name: gitops 
+  tasks:
+    - name: generate-id
+      taskRef:
+        name: generate-build-id
+      params:
+        - name: base-version
+          value: $(params.build-stage)
+    - name: clone-sources-commonlib
+      taskRef:
+        name: git-clone
+      runAfter:
+        - generate-id
+      params:
+        - name: url
+          value: http://gitea.smt-devops/tekton/commonlib_back.git
+        - name: revision
+          value: master
+        - name: subdirectory
+          value: commonlib_back
+      workspaces:
+        - name: output
+          workspace: source
+    - name: clone-sources
+      taskRef:
+        name: git-clone
+      runAfter:
+        - clone-sources-commonlib
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.revision)
+        - name: subdirectory
+          value: $(params.subdirectory)
+      workspaces:
+        - name: output
+          workspace: source
+    - name: build-image
+      taskRef:
+        name: jib-gradle
+      runAfter:
+        - clone-sources
+      params:
+        - name: IMAGE
+          value: $(params.image-url):$(tasks.generate-id.results.build-id)
+        - name: INSECUREREGISTRY
+          value: $(params.insecure-registry)
+        - name: DIRECTORY
+          value: $(params.subdirectory)
+        - name: CACHE
+          value: pvc-mobility-cache
+      workspaces:
+        - name: source
+          workspace: source
+    - name: deploy
+      taskRef:
+        name: deploy
+      runAfter:
+        - build-image
+      params:
+        - name: argo-app-name
+          value: "smt-backend"
+        - name: gitops-url
+          value: "http://gitea.gitea:3000/tekton/mobility-deploy.git"
+        - name: image-url
+          value: $(params.image-url)
+        - name: build-id
+          value: $(tasks.generate-id.results.build-id)
+      workspaces:
+        - name: gitops
+          workspace: gitops
