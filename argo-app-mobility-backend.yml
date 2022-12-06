@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mobility-back
+  namespace: argocd
+spec:
+  project: default # You may need to change this!
+  source:
+    path: ./
+    repoURL: http://gitea.gitea:3000/tekton/mobility_back_deploy.git
+    targetRevision: master
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mobility
+  syncPolicy:
+    ## https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

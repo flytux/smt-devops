@@ -8,7 +8,7 @@ spec:
   - name: gitops-url
     default: "http://192.168.121.151:30079/scm/kbdev/kb-dev-deployments.git"
   - name: gitops-revision
-    default: "main"
+    default: "master"
   - name: image-url
   - name: build-id
   - name: deploy-manifest

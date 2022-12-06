@@ -1,22 +1,22 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: mobility-backend-build-
+  generateName: mobility-frontend-build-
 spec:
   serviceAccountName: sa-pipeline-runner
   pipelineRef:
-    name: build-gradle-jib
+    name: build-frontend-buildah
   params:
   - name: revision
     value: master
-  - name: insecure-registry
-    value: "true"
+  - name: tls-verify
+    value: "false"
   - name: subdirectory
-    value: "mobility_back"
+    value: "mobility_front"
   - name: git-url
-    value: http://gitea.gitea:3000/tekton/mobility_back.git
+    value: http://gitea.gitea:3000/tekton/mobility_front.git
   - name: image-url
-    value: "docker.smt-devops/mobility/mobility-back"
+    value: "docker.smt-devops/mobility/mobility_front"
   workspaces:
   - name: source
     persistentvolumeclaim:

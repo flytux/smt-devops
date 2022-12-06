@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: build-gradle-jib
+  name: build-frontend-buildah
 spec:
   params:
     - name: git-url 
@@ -9,7 +9,7 @@ spec:
       default: master
     - name: subdirectory
     - name: image-url 
-    - name: insecure-registry
+    - name: tls-verify
       default: "false"
     - name: build-stage
       default: "dev"
@@ -23,26 +23,9 @@ spec:
       params:
         - name: base-version
           value: $(params.build-stage)
-    - name: clone-sources-commonlib
-      taskRef:
-        name: git-clone
-      runAfter:
-        - generate-id
-      params:
-        - name: url
-          value: http://gitea.smt-devops/tekton/commonlib_back.git
-        - name: revision
-          value: master
-        - name: subdirectory
-          value: commonlib_back
-      workspaces:
-        - name: output
-          workspace: source
     - name: clone-sources
       taskRef:
         name: git-clone
-      runAfter:
-        - clone-sources-commonlib
       params:
         - name: url
           value: $(params.git-url)
@@ -55,18 +38,16 @@ spec:
           workspace: source
     - name: build-image
       taskRef:
-        name: jib-gradle
+        name: buildah
       runAfter:
         - clone-sources
       params:
         - name: IMAGE
           value: $(params.image-url):$(tasks.generate-id.results.build-id)
-        - name: INSECUREREGISTRY
-          value: $(params.insecure-registry)
-        - name: DIRECTORY
+        - name: TLSVERIFY
+          value: $(params.tls-verify)
+        - name: CONTEXT
           value: $(params.subdirectory)
-        - name: CACHE
-          value: pvc-mobility-cache
       workspaces:
         - name: source
           workspace: source
@@ -77,9 +58,9 @@ spec:
         - build-image
       params:
         - name: argo-app-name
-          value: "mobility-back"
+          value: "mobility-front"
         - name: gitops-url
-          value: "http://gitea.gitea:3000/tekton/mobility_back_deploy.git"
+          value: "http://gitea.gitea:3000/tekton/mobility_front_deploy.git"
         - name: image-url
           value: $(params.image-url)
         - name: build-id

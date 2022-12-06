@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
-  name: mobility-backend-listener
+  name: mobility-frontend-listener
 spec:
   serviceAccountName: sa-pipeline-trigger
   triggers:
@@ -47,11 +47,11 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: mobility-backend-run-
+        generateName: mobility-frontend-trigger-
       spec:
         serviceAccountName: sa-pipeline-runner
         pipelineRef:
-          name: build-gradle-jib
+          name: build-frontend-buildah
         params:
           - name: image-url
             value: docker.smt-devops/mobility/$(tt.params.image-name)
@@ -59,8 +59,8 @@ spec:
             value: $(tt.params.gitrevision)
           - name: git-url
             value: $(tt.params.gitrepositoryurl)
-          - name: insecure-registry
-            value: "true"
+          - name: tls-verify
+            value: "false"
           - name: subdirectory
             value: $(tt.params.image-name)
         workspaces:
