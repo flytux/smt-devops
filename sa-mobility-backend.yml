@@ -4,7 +4,7 @@ kind: Secret
 metadata:
     name: docker-auth
     annotations:
-      tekton.dev/docker-0: docker.smt-devops
+      tekton.dev/docker-0: docker.smt-dev-private-riders
 type: kubernetes.io/basic-auth
 stringData:
     username: admin

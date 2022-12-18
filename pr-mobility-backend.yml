@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: mobility-backend-build-
+  generateName: mobility-b2c-back-build-
 spec:
   serviceAccountName: sa-pipeline-runner
   pipelineRef:
@@ -12,15 +12,19 @@ spec:
   - name: insecure-registry
     value: "true"
   - name: subdirectory
-    value: "mobility_back"
+    value: "mobility-b2c-back"
   - name: git-url
-    value: http://gitea.gitea:3000/tekton/mobility_back.git
+    value: http://gitea.gitea:3000/tekton/mobility-b2c-back.git
   - name: image-url
-    value: "docker.smt-devops/mobility/mobility-back"
+    value: "docker.smt-dev-private-riders/mobility-b2c-back/mobility-api"
+  - name: argo-app-name
+    value: "mobility-b2c-back-api"
+  - name: gitops-url
+    value: "http://gitea.gitea:3000/tekton/mobility-b2c-back-deploy.git"
   workspaces:
   - name: source
     persistentvolumeclaim:
-      claimName: pvc-mobility-build
+      claimName: pvc-riders-build
   - name: gitops
     emptyDir: {}
 

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-mobility-build
+  name: pvc-riders-build
   namespace: build
 spec:
   accessModes:
@@ -15,7 +15,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-mobility-cache
+  name: pvc-riders-cache
   namespace: build
 spec:
   accessModes:

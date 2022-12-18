@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: mobility-back
+  name: mobility-riders-back
   namespace: argocd
 spec:
   project: default # You may need to change this!
   source:
     path: ./
-    repoURL: http://gitea.gitea:3000/tekton/mobility_back_deploy.git
+    repoURL: http://gitea.gitea:3000/tekton/mobility_b2c_back_deploy.git
     targetRevision: master
 
   destination:

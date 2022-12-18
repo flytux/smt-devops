@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
-  name: mobility-backend-listener
+  name: mobility-b2c-back-listener
 spec:
   serviceAccountName: sa-pipeline-trigger
   triggers:
@@ -28,8 +28,8 @@ spec:
       value: $(body.after)
     - name: gitrepositoryurl
       value: $(body.repository.clone_url)
-    - name: image-name
-      value: $(body.repository.name)
+    - name: image-name 
+      value: $(body.repository.name)/mobility-api
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
@@ -47,14 +47,14 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: mobility-backend-run-
+        generateName: mobility-b2c-back-run-
       spec:
         serviceAccountName: sa-pipeline-runner
         pipelineRef:
           name: build-gradle-jib
         params:
           - name: image-url
-            value: docker.smt-devops/mobility/$(tt.params.image-name)
+            value: docker.smt-dev-private-riders/$(tt.params.image-name)
           - name: revision
             value: $(tt.params.gitrevision)
           - name: git-url
@@ -63,9 +63,13 @@ spec:
             value: "true"
           - name: subdirectory
             value: $(tt.params.image-name)
+          - name: argo-app-name
+            value: "mobility-b2c-back-api"
+          - name: gitops-url
+            value: "http://gitea.gitea:3000/tekton/mobility-b2c-back-deploy.git"
         workspaces:
         - name: source
           persistentvolumeclaim:
-            claimName: pvc-mobility-build
+            claimName: pvc-riders-build
         - name: gitops
           emptyDir: {}

@@ -108,4 +108,4 @@ spec:
     emptyDir: {}
   - name: $(params.CACHE)
     persistentVolumeClaim:
-      claimName: pvc-mobility-cache
+      claimName: pvc-riders-cache
